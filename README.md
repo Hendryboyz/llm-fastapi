@@ -5,7 +5,7 @@ Practice integrate LLM and related frameworks to RESTful API in 30 days.
 
 ```bash
 # Start the App
-uvicorn src.main:app --reload
+ENV_FILE=configs/local.env uvicorn src.main:app --reload
 ```
 
 ---

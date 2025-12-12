@@ -1,9 +1,17 @@
-from typing import Union
 from fastapi import FastAPI
-from .config import get_settings
-from .llm.router import router as llm_router
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+from .ai.client import OpenAIClient
+from .chat.router import router as llm_router
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    ai_client = OpenAIClient()
+    app.state.ai_client = ai_client
+    yield
+    
+
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(llm_router)
 

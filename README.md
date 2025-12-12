@@ -1,9 +1,18 @@
 # LLM-FastAPI
 Practice integrate LLM and related frameworks to RESTful API in 30 days.
 
+## Get Started
+
+* This project manage the dependencies with Pipenv. Please [install Pipenv](https://pipenv.pypa.io/en/latest/#installation) first
+* Install the dependencies and create virtual environment with `pipenv install`
+* Execute `pipenv shell` to check the path of virtual environment
+* Select the python interpreter in the virtual environment
+
 ## Command
 
 ```bash
+# Start virtual environment
+pipenv shell
 # Start the App
 ENV_FILE=configs/local.env uvicorn src.main:app --reload
 ```

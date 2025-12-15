@@ -9,10 +9,8 @@ async def lifespan(app: FastAPI):
     ai_client = OpenAIClient()
     app.state.ai_client = ai_client
     yield
-    
 
 app = FastAPI(lifespan=lifespan)
-
 app.include_router(llm_router)
 
 @app.get('/health')

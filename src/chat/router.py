@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from typing import Annotated
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
 from .schemas import CreateLLMGenerationRequest
@@ -10,16 +11,33 @@ router = APIRouter(
     tags=['chat'],
 )
 
+def generate_params(payload: CreateLLMGenerationRequest, format: bool = False):
+    return {
+        'prompt': payload.prompt,
+        'format': format,
+    }
+
 @router.post('/generate')
-def generate(payload: CreateLLMGenerationRequest, ai_client: AIClientDeps = None):
-    response = create_reasoning_response(payload.prompt, ai_client=ai_client)
-    return response.output
+def generate(
+    payloads: Annotated[dict, Depends(generate_params)],
+    ai_client: AIClientDeps = None
+):
+    response = create_reasoning_response(payloads['prompt'], format=payloads['format'], ai_client=ai_client)
+    if payloads['format']:
+        return response.output_parsed
+    else:
+        return response.output
 
 
 
 @router.post('/generate/stream', response_class=StreamingResponse)
-async def streaming_generate(payload: CreateLLMGenerationRequest, ai_client: AIClientDeps = None):
-    response = create_reasoning_response(payload.prompt, stream=True, ai_client=ai_client)
+async def streaming_generate(
+    payloads: Annotated[dict, Depends(generate_params)],
+    ai_client: AIClientDeps = None
+):
+    if payloads['format']:
+        raise HTTPException(status_code=400, detail='Streaming is not supported for format response')
+    response = create_reasoning_response(payloads['prompt'], stream=True, ai_client=ai_client)
 
     async def event_stream():
         for event in response:

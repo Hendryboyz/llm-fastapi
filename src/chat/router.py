@@ -5,6 +5,7 @@ from fastapi.responses import StreamingResponse
 from .schemas import CreateLLMGenerationRequest
 from .service import create_reasoning_response
 from ..dependencies import AIClientDeps
+from .exceptions import DenyFormatException
 
 router = APIRouter(
     prefix='/chat',
@@ -36,7 +37,7 @@ async def streaming_generate(
     ai_client: AIClientDeps = None
 ):
     if payloads['format']:
-        raise HTTPException(status_code=400, detail='Streaming is not supported for format response')
+        raise DenyFormatException(error_code=1000001, status_code=422, error_message='Streaming is not supported for format response')
     response = create_reasoning_response(payloads['prompt'], stream=True, ai_client=ai_client)
 
     async def event_stream():
